@@ -1,9 +1,17 @@
 import React from 'react';
 import { gql } from 'apollo-boost';
 import { Query } from "react-apollo";
-import ItemCard from './ItemCard';
-import LoadingComponent from './LoadingComponent';
+
+// Material Components
 import Grid from '@material-ui/core/Grid';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+
+// Components
+import ItemCard from './ItemCard';
+import ResponsiveDialog from './ResponsiveDialog';
+import LoadingComponent from './LoadingComponent';
 
 const loadingList = [1,2,3,4,5,6];
 
@@ -17,14 +25,24 @@ const CharactersQuery = () => {
                 results {
                   id
                   name
-                  type
+                  species
                   image
+                  status
+                  gender
+                  episode{
+                    id
+                    name
+                    air_date
+                  }	
                 }
               }
             }
           `}
         >
           {({ loading, error, data }) => {
+            const episodes = data.characters;
+            console.log('hay algo? ', episodes)
+
             if (loading) return (
               <React.Fragment>
                 {loadingList.map(i =>
@@ -42,7 +60,22 @@ const CharactersQuery = () => {
                   image={character.image} 
                   name={character.name} 
                   status={character.status} 
-                />
+                  species={character.species}
+                  gender={character.gender}
+                >
+                  <ResponsiveDialog title="¡Capitulos en los que esta!" textButton="ver capitulos">
+                    <List dense>  
+                      {character.episode.map(e => (
+                        <ListItem key={e.id}>
+                          <ListItemText
+                          primary={`Capítulo: ${e.id}`}
+                          secondary={e.name}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </ResponsiveDialog>
+                </ItemCard>
               </Grid>
             ));
           }}
